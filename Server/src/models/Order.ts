@@ -57,6 +57,7 @@ const OrderSchema: Schema<Order> = new Schema({
             type: Number,
             required: true
         },
+        _id: false
     }],
     status: {
         type: String,

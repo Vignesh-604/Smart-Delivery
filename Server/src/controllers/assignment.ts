@@ -10,7 +10,7 @@ const smartAssignment = async (req: Request, res: Response) => {
     try {
         const orders = await Order.find({ status: "pending" })
         if (!orders || orders.length === 0) {
-            return res.status(400).json(new ApiResponse(400, null, "NO pending orders"));
+            res.status(400).json(new ApiResponse(400, null, "NO pending orders"));
         }
 
         const now = dayjs().format("HH:mm");
@@ -48,9 +48,9 @@ const smartAssignment = async (req: Request, res: Response) => {
             })
         }
 
-        return res.status(200).json(new ApiResponse(200, null, "Order assigned successfully"));
+        res.status(200).json(new ApiResponse(200, null, "Order assigned successfully"));
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500, error, "Something went wrong while assigning order"));
+        res.status(500).json(new ApiResponse(500, error, "Something went wrong while assigning order"));
     }
 }
 
@@ -79,7 +79,7 @@ const getAssignmentMetrics = async (req: Request, res: Response) => {
             },
         ]);
 
-        return res.status(200).json(
+        res.status(200).json(
             new ApiResponse(200, {
                 totalAssigned: totalSuccess,
                 successRate: Number(successRate),
@@ -88,7 +88,7 @@ const getAssignmentMetrics = async (req: Request, res: Response) => {
             }, "Assignment metrics fetched")
         );
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500, null, "Failed to fetch assignment metrics"));
+        res.status(500).json(new ApiResponse(500, null, "Failed to fetch assignment metrics"));
     }
 }
 

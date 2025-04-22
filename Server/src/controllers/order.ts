@@ -11,7 +11,7 @@ const createOrder = async (req: Request, res: Response) => {
         const { name, phone, address, area, items = [] } = req.body;
 
         if (!name || !phone || !address || !area || items.length === 0) {
-            return res.status(400).json(new ApiResponse(400, null, "Some fields are missing or No items in order"));
+            res.status(400).json(new ApiResponse(400, null, "Some fields are missing or No items in order"));
         }
 
         const date = dayjs().format("YYYYMMDD");
@@ -21,7 +21,7 @@ const createOrder = async (req: Request, res: Response) => {
         const scheduledFor = dayjs().add(30, "minute").format("HH:mm");
 
         const totalAmount = items.reduce((total: number, current: { price: number, quantity: number }) => {
-            return total += (current.price * current.quantity)
+            total += (current.price * current.quantity)
         }, 0)
 
         const order = await Order.create({
@@ -33,10 +33,10 @@ const createOrder = async (req: Request, res: Response) => {
             totalAmount,
         });
 
-        return res.status(201).json(new ApiResponse(201, order, "Order created"));
+        res.status(201).json(new ApiResponse(201, order, "Order created"));
 
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500, error, "Something went wrong while creating order."));
+        res.status(500).json(new ApiResponse(500, error, "Something went wrong while creating order."));
     }
 }
 
@@ -46,22 +46,18 @@ const toggleStatus = async (req: Request, res: Response) => {
         const { status } = req.body;
 
         if (!orderId || !mongoose.isValidObjectId(orderId)) {
-            return res
-                .status(400)
-                .json(new ApiResponse(400, null, "Incorrect or missing order ID"));
+            res.status(400).json(new ApiResponse(400, null, "Incorrect or missing order ID"));
         }
 
         const allowedStatuses = ["picked", "delivered"];
         if (!allowedStatuses.includes(status)) {
-            return res
-                .status(400)
-                .json(new ApiResponse(400, null, "Invalid order status"));
+            res.status(400).json(new ApiResponse(400, null, "Invalid order status"));
         }
 
-        const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+        const order: any = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
 
         if (!order) {
-            return res.status(404).json(new ApiResponse(404, null, "Order not found"));
+            res.status(404).json(new ApiResponse(404, null, "Order not found"));
         }
 
         if (order.assignedTo) {
@@ -73,10 +69,10 @@ const toggleStatus = async (req: Request, res: Response) => {
             }
         }
 
-        return res.status(200).json(new ApiResponse(200, order, "Order status updated successfully"));
+        res.status(200).json(new ApiResponse(200, order, "Order status updated successfully"));
     } catch (error) {
         console.error("Toggle Status Error:", error);
-        return res
+        res
             .status(500)
             .json(new ApiResponse(500, null, "Something went wrong while updating"));
     }
@@ -87,18 +83,18 @@ const getOrderById = async (req: Request, res: Response) => {
         const { id } = req.params;
 
         if (!id || !mongoose.isValidObjectId(id)) {
-            return res.status(400).json(new ApiResponse(400, null, "Invalid order ID"));
+            res.status(400).json(new ApiResponse(400, null, "Invalid order ID"));
         }
 
         const order = await Order.findById(id).populate("assignedTo");
 
         if (!order) {
-            return res.status(404).json(new ApiResponse(404, null, "Order not found"));
+            res.status(404).json(new ApiResponse(404, null, "Order not found"));
         }
 
-        return res.status(200).json(new ApiResponse(200, order, "Order fetched"));
+        res.status(200).json(new ApiResponse(200, order, "Order fetched"));
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500, null, "Something went wrong"));
+        res.status(500).json(new ApiResponse(500, null, "Something went wrong"));
     }
 }
 
@@ -120,12 +116,12 @@ const getAllOrders = async (req: Request, res: Response) => {
         const orders = await Order.find(filter).sort({ createdAt: -1 }).populate("assignedTo");
 
         if (!orders || orders.length === 0) {
-            return res.status(404).json(new ApiResponse(404, [], "No orders found"));
+            res.status(404).json(new ApiResponse(404, [], "No orders found"));
         }
 
-        return res.status(200).json(new ApiResponse(200, orders, "Orders fetched"));
+        res.status(200).json(new ApiResponse(200, orders, "Orders fetched"));
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500, null, "Something went wrong"));
+        res.status(500).json(new ApiResponse(500, null, "Something went wrong"));
     }
 }
 
@@ -134,20 +130,20 @@ const assignManualOrder = async (req: Request, res: Response) => {
         const { partnerId, orderId } = req.body;
 
         if (!mongoose.isValidObjectId(partnerId) || !mongoose.isValidObjectId(orderId)) {
-            return res.status(400).json(new ApiResponse(400, null, "Something went wrong while assigning order"));
+            res.status(400).json(new ApiResponse(400, null, "Something went wrong while assigning order"));
         }
 
-        const order = await Order.findById(orderId);
+        const order: any = await Order.findById(orderId);
         if (!order) {
-            return res.status(400).json(new ApiResponse(400, null, "Order not found"));
+            res.status(400).json(new ApiResponse(400, null, "Order not found"));
         }
         if (order.status !== "pending") {
-            return res.status(400).json(new ApiResponse(400, null, "Order has already been assigned"));
+            res.status(400).json(new ApiResponse(400, null, "Order has already been assigned"));
         }
 
-        const partner = await DeliveryPartner.findById(partnerId);
+        const partner: any = await DeliveryPartner.findById(partnerId);
         if (!partner) {
-            return res.status(404).json(new ApiResponse(404, null, "Partner not found"));
+            res.status(404).json(new ApiResponse(404, null, "Partner not found"));
         }
 
         const now = dayjs().format("HH:mm");
@@ -164,7 +160,7 @@ const assignManualOrder = async (req: Request, res: Response) => {
                 orderId, partnerId, status: "failed", reason: "Partner not eligible."
             })
 
-            return res.status(400).json(new ApiResponse(400, null, "Assignment failed"));
+            res.status(400).json(new ApiResponse(400, null, "Assignment failed"));
         }
 
         order.status = "assigned";
@@ -178,9 +174,9 @@ const assignManualOrder = async (req: Request, res: Response) => {
             orderId, partnerId, status: "success"
         })
 
-        return res.status(200).json(new ApiResponse(200, order, "Order assigned successfully"));
+        res.status(200).json(new ApiResponse(200, order, "Order assigned successfully"));
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500, error, "Something went wrong while assigning order"));
+        res.status(500).json(new ApiResponse(500, error, "Something went wrong while assigning order"));
     }
 }
 
