@@ -45,8 +45,8 @@ const getAllPartners = async (_req: Request, res: Response) => {
 
 const updatePartner = async (req: Request, res: Response) => {
     try {
-        const {partnerId} = req.params;
-        if (!partnerId || mongoose.isValidObjectId(partnerId)) {
+        const { partnerId } = req.params;
+        if (!partnerId || !mongoose.isValidObjectId(partnerId)) {
             return res.status(400).json(new ApiResponse(400, null, "Incorrect or missing partner ID"));
         }
         const { name, email, phone, areas, start, end, status } = req.body;
@@ -75,7 +75,7 @@ const updatePartner = async (req: Request, res: Response) => {
 
 const deletePartner = async (req: Request, res: Response) => {
     try {
-        const {partnerId} = req.params;
+        const { partnerId } = req.params;
         if (!partnerId || !mongoose.isValidObjectId(partnerId)) {
             return res.status(400).json(new ApiResponse(400, null, "Incorrect or missing partner ID"));
         }
@@ -85,7 +85,7 @@ const deletePartner = async (req: Request, res: Response) => {
         return res.status(200).json(new ApiResponse(200, null, "Deleted Partner"));
     } catch (error) {
         return res.status(500).json(new ApiResponse(500, null, "Something went wrong while deleting partners"));
-        
+
     }
 }
 
@@ -106,7 +106,7 @@ const findEligiblePartners = async (req: Request, res: Response) => {
         })
 
         // partners currently within their shift period
-        const eligible = partners.filter(partner => { 
+        const eligible = partners.filter(partner => {
             return now >= partner.shift.start && now <= partner.shift.end;
         })
 

@@ -13,9 +13,9 @@ export interface Order extends Document {
         quantity: number;
         price: number;
     }[];
-    status: 'pending' | 'assigned' | 'picked' | 'delivered';
-    scheduledFor: string;  
-    assignedTo?: mongoose.Types.ObjectId;   
+    status: 'pending' | 'assigned' | 'picked' | 'delivered' | 'cancelled';
+    scheduledFor: string;
+    assignedTo?: mongoose.Types.ObjectId;
     totalAmount: number;
     createdAt: Date;
     updatedAt: Date;
@@ -60,8 +60,8 @@ const OrderSchema: Schema<Order> = new Schema({
     }],
     status: {
         type: String,
-        enum: ['pending', 'assigned', 'picked', 'delivered'],
-        required: true,
+        enum: ['pending', 'assigned', 'picked', 'delivered', 'cancelled'],
+        default: "pending",
     },
     scheduledFor: {
         type: String,
