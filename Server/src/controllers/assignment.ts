@@ -5,7 +5,7 @@ import dayjs from "dayjs"
 import Order from "../models/Order";
 import DeliveryPartner from "../models/DeliveryPartner";
 
-const smartAssignment = async (req: Request, res: Response) => {
+const smartAssignment = async (_req: Request, res: Response) => {
     try {
         const orders = await Order.find({ status: "pending" })
         if (!orders || orders.length === 0) {
@@ -24,12 +24,10 @@ const smartAssignment = async (req: Request, res: Response) => {
             if (start < end) {
                 return now >= start && now <= end;
             } else {
-                // Overnight shift (e.g., 22:00–06:00)
                 return now >= start || now <= end;
             }
         });
-console.log("Partners", partners)
-console.log("eligible", eligiblePartners)
+
         for (const order of orders) {
             const orderArea = order.area.toLowerCase().replace(/\s+/g, "");
 
@@ -38,8 +36,8 @@ console.log("eligible", eligiblePartners)
                     (area: string) => area.toLowerCase().replace(/\s+/g, "") === orderArea
                 )
             );
-console.log("only eligible", eligible)
-            if (eligible.length === 0) continue;    // no eligible partners for this order. skip
+
+            if (eligible.length === 0) continue
 
             // first partner with least currentLoad
             const selected: any = eligible.sort((a, b) => a.currentLoad - b.currentLoad)[0];
@@ -64,14 +62,13 @@ console.log("only eligible", eligible)
     }
 }
 
-const getAssignmentMetrics = async (req: Request, res: Response) => {
+const getAssignmentMetrics = async (_req: Request, res: Response) => {
     try {
         const total = await Assignment.countDocuments();
         const totalSuccess = await Assignment.countDocuments({ status: "success" });
 
         const successRate = total === 0 ? 0 : ((totalSuccess / total) * 100).toFixed(2);
 
-        // Get failure reasons breakdown
         const failureReasons = await Assignment.aggregate([
             { $match: { status: "failed", reason: { $ne: null } } },
             {
@@ -124,7 +121,7 @@ const getAssignmentHistory = async (req: Request, res: Response) => {
     }
 }
 
-const getDashboardMetrics = async (req: Request, res: Response) => {
+const getDashboardMetrics = async (_req: Request, res: Response) => {
     try {
 
         const activeOrders = await Order.countDocuments({ status: "assigned" });
