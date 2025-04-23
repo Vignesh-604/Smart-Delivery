@@ -69,7 +69,7 @@ const AssignmentHistory = () => {
         const fetchAssignments = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get<AssignmentApiResponse>('http://localhost:5000/api/assignments/history');
+                const response = await axios.get<AssignmentApiResponse>('/api/assignments/history');
                 setAssignments(response.data.data);
                 setLoading(false);
             } catch (err) {

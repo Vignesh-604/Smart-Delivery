@@ -33,7 +33,7 @@ const Partners = () => {
     const fetchPartners = async () => {
       try {
         setLoading(true);
-        const response = await axios.get<ApiResponse>('/api/partners/');
+        const response = await axios.get<ApiResponse>('/api/partners');
         if (response.data.success) {
           setPartners(response.data.data);
         } else {
