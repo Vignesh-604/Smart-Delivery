@@ -13,7 +13,6 @@ import PartnerList from "@/pages/Partners/PartnerList";
 import PartnerForm from "@/pages/Partners/PartnerForm";
 import OrderList from "@/pages/Orders/OrderList";
 import OrderDetails from "@/pages/Orders/OrderDetails";
-// import Metrics from "@/pages/Assignments/Metrics";
 import History from "@/pages/Assignment/History"
 
 export const router = createBrowserRouter(
@@ -27,8 +26,7 @@ export const router = createBrowserRouter(
         <Route path="/orders" element={<OrderList />} />
         <Route path="/orders/:id" element={<OrderDetails />} />
         <Route path="/assignments" element={<History />} />
-        {/* <Route path="/assignments/metrics" element={<Metrics />} /> */}
-        {/* Fallback */}
+
         <Route path="*" element={<Dashboard />} />
       </Route>
     </>

@@ -130,101 +130,103 @@ export default function OrderDetailsPage() {
     }
 
     return (
-        <div className="p-6 max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800">Order Details</h1>
+        <div className="p-3 md:p-6 max-w-6xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800">Order Details</h1>
                 <button
                     onClick={() => window.history.back()}
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
                 >
                     Back to Orders
                 </button>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-                <div className="flex justify-between items-start mb-6">
-                    <div>
-                        <h2 className="text-xl font-semibold text-gray-800">{order.orderNumber}</h2>
-                        <p className="text-gray-600 mt-1"><b>Area:</b> {order.area}</p>
-                        <p className="text-gray-600"><b>Scheduled for:</b> {order.scheduledFor}</p>
-                        <p className="text-gray-600"><b>Created:</b> {formatDate(order.createdAt)}</p>
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 border border-gray-100">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-start gap-4 mb-4 md:mb-6">
+                    <div className="w-full md:w-auto">
+                        <h2 className="text-lg md:text-xl font-semibold text-gray-800">{order.orderNumber}</h2>
+                        <p className="text-gray-600 mt-1 text-sm md:text-base"><b>Area:</b> {order.area}</p>
+                        <p className="text-gray-600 text-sm md:text-base"><b>Scheduled for:</b> {order.scheduledFor}</p>
+                        <p className="text-gray-600 text-sm md:text-base"><b>Created:</b> {formatDate(order.createdAt)}</p>
                         {order.updatedAt !== order.createdAt && (
-                            <p className="text-gray-600"><b>Last Updated:</b> {formatDate(order.updatedAt)}</p>
+                            <p className="text-gray-600 text-sm md:text-base"><b>Last Updated:</b> {formatDate(order.updatedAt)}</p>
                         )}
                     </div>
-                    <div className="text-right">
-                        <span className={`px-4 py-2 rounded-full text-sm font-medium inline-block ${getStatusColor(order.status)}`}>
+                    <div className="w-full md:w-auto text-left md:text-right">
+                        <span className={`px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium inline-block ${getStatusColor(order.status)}`}>
                             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
 
-                        <div className="mt-4">
+                        <div className="mt-3 md:mt-4">
                             {order.status === 'pending' ? (
                                 <button
                                     onClick={handleManualAssign}
-                                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm font-medium transition-colors shadow-sm w-full md:w-auto"
                                 >
                                     Manual Assign
                                 </button>
                             ) : order.assignedTo ? (
                                 <div className="bg-blue-50 p-3 rounded-lg shadow-sm text-left">
-                                    <p className="text-gray-700 text-sm">Assigned to:</p>
-                                    <p className="font-semibold text-gray-800">{order.assignedTo.name}</p>
-                                    <p className="text-gray-600 text-sm">{order.assignedTo.email}</p>
+                                    <p className="text-gray-700 text-xs md:text-sm">Assigned to:</p>
+                                    <p className="font-semibold text-gray-800 text-sm md:text-base">{order.assignedTo.name}</p>
+                                    <p className="text-gray-600 text-xs md:text-sm">{order.assignedTo.email}</p>
                                 </div>
                             ) : null}
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-gray-200 pt-6 mt-6">
-                    <h3 className="font-semibold text-lg mb-4 text-gray-800">Customer Information</h3>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="border-t border-gray-200 pt-4 md:pt-6 mt-4 md:mt-6">
+                    <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4 text-gray-800">Customer Information</h3>
+                    <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                             <div>
-                                <p className="text-gray-500 text-sm">Name</p>
-                                <p className="font-medium text-gray-800">{order.customer.name}</p>
+                                <p className="text-gray-500 text-xs md:text-sm">Name</p>
+                                <p className="font-medium text-gray-800 text-sm md:text-base">{order.customer.name}</p>
                             </div>
                             <div>
-                                <p className="text-gray-500 text-sm">Phone</p>
-                                <p className="font-medium text-gray-800">{order.customer.phone}</p>
+                                <p className="text-gray-500 text-xs md:text-sm">Phone</p>
+                                <p className="font-medium text-gray-800 text-sm md:text-base">{order.customer.phone}</p>
                             </div>
                             <div>
-                                <p className="text-gray-500 text-sm">Address</p>
-                                <p className="font-medium text-gray-800">{order.customer.address}</p>
+                                <p className="text-gray-500 text-xs md:text-sm">Address</p>
+                                <p className="font-medium text-gray-800 text-sm md:text-base">{order.customer.address}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="border-t border-gray-200 pt-6 mt-6">
-                    <h3 className="font-semibold text-lg mb-4 text-gray-800">Order Items</h3>
+                <div className="border-t border-gray-200 pt-4 md:pt-6 mt-4 md:mt-6">
+                    <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4 text-gray-800">Order Items</h3>
                     <div className="bg-gray-50 rounded-lg overflow-hidden">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="bg-gray-100">
-                                    <th className="px-4 py-3 text-gray-600 text-sm font-medium">Item</th>
-                                    <th className="px-4 py-3 text-gray-600 text-sm font-medium">Quantity</th>
-                                    <th className="px-4 py-3 text-gray-600 text-sm font-medium">Price</th>
-                                    <th className="px-4 py-3 text-gray-600 text-sm font-medium text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {order.items.map((item, idx) => (
-                                    <tr key={idx} className="border-t border-gray-200">
-                                        <td className="px-4 py-3">{item.name}</td>
-                                        <td className="px-4 py-3">{item.quantity}</td>
-                                        <td className="px-4 py-3">₹ {item.price.toFixed(2)}</td>
-                                        <td className="px-4 py-3 text-right">₹ {(item.quantity * item.price).toFixed(2)}</td>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        <th className="px-3 md:px-4 py-2 md:py-3 text-gray-600 text-xs md:text-sm font-medium">Item</th>
+                                        <th className="px-3 md:px-4 py-2 md:py-3 text-gray-600 text-xs md:text-sm font-medium">Quantity</th>
+                                        <th className="px-3 md:px-4 py-2 md:py-3 text-gray-600 text-xs md:text-sm font-medium">Price</th>
+                                        <th className="px-3 md:px-4 py-2 md:py-3 text-gray-600 text-xs md:text-sm font-medium text-right">Subtotal</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                            <tfoot>
-                                <tr className="border-t border-gray-200 font-semibold bg-gray-100">
-                                    <td colSpan={3} className="px-4 py-3 text-right">Total:</td>
-                                    <td className="px-4 py-3 text-right">₹ {calculateTotal(order.items).toFixed(2)}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {order.items.map((item, idx) => (
+                                        <tr key={idx} className="border-t border-gray-200">
+                                            <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm">{item.name}</td>
+                                            <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm">{item.quantity}</td>
+                                            <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm">₹ {item.price.toFixed(2)}</td>
+                                            <td className="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-right">₹ {(item.quantity * item.price).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                <tfoot>
+                                    <tr className="border-t border-gray-200 font-semibold bg-gray-100">
+                                        <td colSpan={3} className="px-3 md:px-4 py-2 md:py-3 text-right text-xs md:text-sm">Total:</td>
+                                        <td className="px-3 md:px-4 py-2 md:py-3 text-right text-xs md:text-sm">₹ {calculateTotal(order.items).toFixed(2)}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
