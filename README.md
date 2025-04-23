@@ -1,128 +1,128 @@
 # Smart Delivery Management System
 
-A web-based admin system to manage delivery partners, orders, and assignments using smart/manual allocation logic.
-Implemented using Typescript, React, Express, Node and MongoDb for database under the course of 4 days. Even though I had litte experience in Typescript, this project, along with the help of AI tools, has been a learning experience for me. I do believe it can be imrpoved on much further but due to the time constaints I was only able to build so much.  
+A web-based admin platform for managing delivery partners, orders, and assignments with smart allocation capabilities.
+Built with TypeScript, React, Express, Node, and MongoDB in just four days. Despite my limited TypeScript experience, this project became a valuable learning opportunity. While there's room for improvement, I'm satisfied of what I accomplished within the time constraints.
+
 ---
 
 ## Tech Stack
 
 ### Backend 
-- Node.js + Express
-- MongoDB with Mongoose
+- Node.js with Express
+- MongoDB + Mongoose
 - TypeScript
-- Postman (for testing)
-- REST APIs
+- RESTful API architecture
+- Tested with Postman
 
 ### Frontend 
-- React + Vite + TypeScript
+- React (Vite)
+- TypeScript
 - Tailwind CSS
-- shadcn/ui for UI components
-- Axios (for HTTP)
+- shadcn/ui components
+- Axios for HTTP requests
 - React Router DOM
 
 ---
 
-## Features Breakdown (from PDF)
+## Features
 
-### 1. Partner Management
-- [x] Partner registration form
-- [x] Partner list view
-- [x] Partner profile editing
-- [x] Partner deleting
-- [x] Finding elgigble partners (not implemented)
+### Partner Management
+- ✅ Partner registration & profile management
+- ✅ Comprehensive partner listing
+- ✅ Edit and delete functionality
+- ❌ Finding eligible partners (backend ready but not implemented)
 
-### 2. Order Processing
-- [x] Orders dashboard with filters
-- [x] Order creation + auto time
-- [x] Order status tracking
-- [x] Manual assignment (not implemented)
-- [x] Assignment history
-- [x] Partner performance metrics
+### Order Processing
+- ✅ Orders dashboard with filtering options
+- ✅ Order creation with automatic timestamps
+- ✅ Order status tracking system
+- ❌ Manual assignment (backend ready but not implemented)
+- ✅ Complete assignment history
+- ✅ Partner performance metrics
 
-### 3. Assignment System
-- [x] Smart (auto) assignment system 
-- [x] Assignment metrics endpoint
-- [x] Assignment history
-- [x] Dashboard
+### Assignment System
+- ✅ Smart auto-assignment algorithm
+- ✅ Detailed assignment metrics
+- ✅ Historical assignment logging
+- ✅ Analytics dashboard
 
 ---
 
 ## Backend API Overview
 
-### Routes
+### Partner Routes (`/api/partners`)
+| Method | Endpoint            | Description                    |
+|--------|---------------------|--------------------------------|
+| POST   | `/`                 | Register new delivery partner  |
+| GET    | `/`                 | List all partners              |
+| GET    | `/:partnerId`       | Get partner details            |
+| PUT    | `/:partnerId`       | Update partner information     |
+| DELETE | `/:partnerId`       | Remove partner                 |
+| GET    | `/eligible`         | Find available partners by area/time |
 
-#### `/api/partners`
-| Method | Route                | Description                    |
-|--------|----------------------|--------------------------------|
-| POST   | `/r`                 | Register new delivery partner  |
-| GET    | `/`                  | Get all partners               |
-| GET    | `/:partnerId`        | Get single partner             |
-| PUT    | `/:partnerId`        | Update partner                 |
-| DELETE | `/:partnerId`        | Delete partner                 |
-| GET    | `/eligible`          | Get eligible partners for area/time |
+### Order Routes (`/api/orders`)
+| Method | Endpoint            | Description                       |
+|--------|---------------------|-----------------------------------|
+| POST   | `/`                 | Create new order                  |
+| GET    | `/`                 | List all orders (supports filters) |
+| GET    | `/:orderId`         | Get specific order details        |
+| PUT    | `/:orderId/status`  | Update order status               |
+| POST   | `/assign`           | Manual order assignment           |
 
-#### `/api/orders`
-| Method | Route                | Description                       |
-|--------|----------------------|-----------------------------------|
-| POST   | `/`                  | Create order                      |
-| GET    | `/`                  | Get all orders + filters          |
-| GET    | `/:orderId`          | Get single order                  |
-| PUT    | `/status/:orderId`   | Toggle order status (picked/delivered) |
-| POST   | `/assign`            | Manually assign order             |
-
-#### `/api/assignments`
-| Method | Route                | Description                       |
-|--------|----------------------|-----------------------------------|
-| POST   | `/run`               | Trigger smart assignment          |
-| GET    | `/metrics`           | Assignment performance metrics    |
-| GET    | `/history`           | Full assignment history log       |
-| GET    | `/dashboard`         | Show dashboard metrics            |
+### Assignment Routes (`/api/assignments`)
+| Method | Endpoint            | Description                       |
+|--------|---------------------|-----------------------------------|
+| POST   | `/run`              | Execute smart assignment          |
+| GET    | `/metrics`          | View performance statistics       |
+| GET    | `/history`          | Access full assignment history    |
+| GET    | `/dashboard`        | Retrieve dashboard analytics      |
 
 ---
 
-## Backend Logic
+## Smart Assignment Logic
 
-### Smart Assignment
-- Orders with `status: "pending"`
-- Active partners (`status: "active"`, `currentLoad < 3`)
-- Shift comparison supports **overnight**
-- Area matched by normalizing strings (`Zone 1` vs `Zone1`)
-- Load-balanced by choosing partner with least `currentLoad`
+The system automatically allocates orders to partners based on:
+- Orders with "pending" status
+- Available partners (active status with current load < 3)
+- Shift compatibility (including overnight shift support)
+- Area matching (with string normalization for consistency)
+- Load balancing (prioritizing partners with lower current loads)
 
-###  Metrics Generation
-- `successRate = (success / total) * 100`
-- Breakdown of failure reasons (`no eligible`, `out of shift`, etc.)
+Performance metrics include:
+- Success rate calculation (successful assignments / total attempts × 100%)
+- Failure reason tracking (no eligible partners, outside shift hours, etc.)
 
 ---
 
-## Frontend Pages
+## Frontend Structure
 
-### `/dashboard`
-- Metrics cards (partners, orders, success rate)
+### Dashboard (/)
+- Key metrics overview
 - Smart assignment trigger
-- Active orders section
-- Recent assignments
-- Quick actions
+- Active order monitoring
+- Recent assignment activity
+- Quick action shortcuts
 
-### `/partners`
-- Register Partner form
-- Partner List (with edit/delete)
-- View by area
+### Partners Section
+- Partner registration interface
+- Comprehensive partner directory
+- Detailed profile management
 
-### `/orders`
-- All orders with filters (status, area, recent)
-- Order details modal
-- Manual assign modal
+### Orders Management
+- Filterable order listing
+- Order detail view
+- Status management options
 
-### `/assignments`
-- Assignment metrics
-- Assignment history list
+### Assignments Tracking
+- Performance metrics visualization
+- Complete assignment history
+- Statistical breakdown
 
 ---
 
 ## Frontend Routing
 
-```ts
+```typescript
 // main.tsx
 <Route path="/" element={<App />} >
     <Route index element={<Dashboard />} />
@@ -139,55 +139,116 @@ Implemented using Typescript, React, Express, Node and MongoDb for database unde
 
 ---
 
-## Filtering & Sorting Features
+## Key Features
 
-- Filter orders by status or recent
-- Assign manually via popup modal (not implemented)
-- Toggle statuses (picked/delivered)
-- Fetch eligible partners for area at current time
-- Backend supports `"recent=true"` filter to get recent orders upto 2 days
+- Status-based order filtering
+- Timestamp-based recent order filtering
+- Order status management
+- Partner eligibility checking
+- Backend supports "recent=true" parameter (returns orders up to 2 days old)
 
 ---
 
-## Sample Partner (Overnight)
+## Deployment Information
+- Backend: Deployed on Render
+- Frontend: Deployed on Vercel
 
+---
+
+## API Documentation
+
+**Base URL:** `https://smart-delivery-api.onrender.com/api`
+*(For local development: http://localhost:5000/api)*
+
+### Assignment Endpoints
+
+**POST /assignments/run**  
+Triggers the smart assignment algorithm for pending orders.
+
+**GET /assignments/metrics**  
+Returns assignment performance statistics.
+
+**GET /assignments/history**  
+Provides complete assignment history with related details.
+
+**GET /assignments/dashboard**  
+Supplies dashboard analytics and metrics.
+
+### Partner Endpoints
+
+**POST /partners**  
+Creates a new delivery partner.
+
+Example request:
 ```json
 {
-  "name": "Sonia Patel",
-  "email": "sonia@example.com",
+  "name": "Tom Wilson",
+  "email": "tom@example.com",
   "phone": "9876543210",
-  "areas": ["Zone1", "Zone3"],
-  "shift": {
-    "start": "22:00",
-    "end": "06:00"
+  "areas": ["Zone1", "Zone2"],
+  "shift" :{
+    "start": "10:00",
+    "end": "20:00"
   }
 }
 ```
 
----
+**GET /partners**  
+Retrieves all registered partners.
 
-## Deployment Notes
-- Use `.env` for Mongo URI and VITE_PROXY
-- Frontend uses proxy for `/api` calls
-- Smart assignment can be scheduled via cron or triggered manually
+**GET /partners/:partnerId**  
+Fetches specific partner information.
 
----
+**PUT /partners/:partnerId**  
+Updates partner details.
 
-## Final Checklist
+**DELETE /partners/:partnerId**  
+Removes a partner from the system.
 
-- [x] All API routes work and tested with Postman
-- [x] Smart assignment handles overnight shifts
-- [x] Partner area mismatch fixed
-- [x] Full admin panel pages built
-- [x] Assignment logging implemented
-- [x] Metrics + history UI done
+**GET /partners/eligible?area=Zone1**  
+Finds available partners for a specific area (planned feature).
 
----
+### Order Endpoints
 
-Let me know if you'd like:
-- A PDF export of this
-- Swagger/OpenAPI docs
-- Cron job setup guide
-- Presentation deck (for evaluation)
+**POST /orders**  
+Creates a new delivery order.
 
-You're all set 💪
+Example request:
+```json
+{
+  "name": "John Smith",
+  "phone": "9876543210",
+  "address": "456 Main Street",
+  "area": "Zone 1",
+  "items": [
+    { "name": "Apple", "quantity": 3, "price": 30 }
+  ]
+}
+```
+
+**GET /orders**  
+Lists all orders with optional filters:
+- `status=pending`
+- `recent=true`
+
+**GET /orders/:id**  
+Retrieves detailed order information.
+
+**PUT /orders/:orderId/status**  
+Updates order status.
+
+Example request:
+```json
+{ "status": "delivered" }
+```
+
+**POST /orders/assign**  
+Manually assigns an order to a specific partner (planned feature).
+
+Example request:
+```json
+{
+  "orderId": "60d21b4667d0d8992e610c85",
+  "partnerId": "60d21b4667d0d8992e610c86"
+}
+```
