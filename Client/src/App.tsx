@@ -1,11 +1,12 @@
-import Dashboard from "./pages/Dashboard"
-
+import { Outlet } from "react-router-dom"
+import Navbar from "./pages/Navbar"
 
 function App() {
 
   return (
-    <div className="">
-      <Dashboard/>
+    <div className="bg-gray-200/20">
+      <Navbar />
+      <Outlet/>
     </div>
   )
 }

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import Assignment from "../models/Assignment";
 import ApiResponse from "../utils/ApiResponse";
 import dayjs from "dayjs"
-import mongoose from "mongoose";
 import Order from "../models/Order";
 import DeliveryPartner from "../models/DeliveryPartner";
 
@@ -18,17 +17,28 @@ const smartAssignment = async (req: Request, res: Response) => {
         const partners = await DeliveryPartner.find({
             status: "active",
             currentLoad: { $lt: 3 },
-            shift: {
-                start: { $lt: now },
-                end: { $gt: now }
-            }
         })
 
+        const eligiblePartners = partners.filter((partner) => {
+            const { start, end } = partner.shift;
+            if (start < end) {
+                return now >= start && now <= end;
+            } else {
+                // Overnight shift (e.g., 22:00–06:00)
+                return now >= start || now <= end;
+            }
+        });
+console.log("Partners", partners)
+console.log("eligible", eligiblePartners)
         for (const order of orders) {
-            const eligible = partners.filter(partner =>
-                partner.areas.includes(order.area)
-            )
+            const orderArea = order.area.toLowerCase().replace(/\s+/g, "");
 
+            const eligible = eligiblePartners.filter((partner) =>
+                partner.areas.some(
+                    (area: string) => area.toLowerCase().replace(/\s+/g, "") === orderArea
+                )
+            );
+console.log("only eligible", eligible)
             if (eligible.length === 0) continue;    // no eligible partners for this order. skip
 
             // first partner with least currentLoad
@@ -94,7 +104,16 @@ const getAssignmentMetrics = async (req: Request, res: Response) => {
 
 const getAssignmentHistory = async (req: Request, res: Response) => {
     try {
-        const assignments = await Assignment.find()
+        const { recent } = req.query;
+        const filter: any = {};
+
+        if (recent === "true") {
+            const start = dayjs().subtract(1, "day").startOf("day").toDate();
+            const end = dayjs().endOf("day").toDate();
+            filter.createdAt = { $gte: start, $lte: end };
+        }
+
+        const assignments = await Assignment.find(filter)
             .sort({ createdAt: -1 })
             .populate("orderId", "orderNumber area status scheduledFor")
             .populate("partnerId", "name email phone status")
@@ -105,4 +124,32 @@ const getAssignmentHistory = async (req: Request, res: Response) => {
     }
 }
 
-export { smartAssignment, getAssignmentMetrics, getAssignmentHistory }
+const getDashboardMetrics = async (req: Request, res: Response) => {
+    try {
+
+        const activeOrders = await Order.countDocuments({ status: "assigned" });
+        const totalOrders = await Order.countDocuments();
+        const totalPartners = await DeliveryPartner.countDocuments();
+        const activePartners = await DeliveryPartner.countDocuments({ status: "active" });
+
+        const totalAttempts = await Assignment.countDocuments();
+        const totalSuccess = await Assignment.countDocuments({ status: "success" });
+
+        const successRate = totalAttempts === 0
+            ? 0
+            : ((totalSuccess / totalAttempts) * 100).toFixed(2);
+
+        res.status(200).json(new ApiResponse(200, {
+            activeOrders,
+            totalOrders,
+            totalPartners,
+            activePartners,
+            successRate: Number(successRate),
+        }, "Assigned orders and metrics fetched"));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json(new ApiResponse(500, null, "Failed to fetch assigned order metrics"));
+    }
+};
+
+export { smartAssignment, getAssignmentMetrics, getAssignmentHistory, getDashboardMetrics }

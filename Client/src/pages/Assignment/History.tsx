@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import { PieChart, CheckCircle, AlertTriangle, FileWarning } from 'lucide-react';
 
 interface Partner {
     _id: string;
@@ -29,9 +30,28 @@ interface Assignment {
     __v: number;
 }
 
-interface ApiResponse {
+interface FailureReason {
+    count: number;
+    reason: string;
+}
+
+interface AssignmentMetrics {
+    totalAssigned: number;
+    successRate: number;
+    totalAttempts: number;
+    failureReasons: FailureReason[];
+}
+
+interface AssignmentApiResponse {
     statusCode: number;
     data: Assignment[];
+    message: string;
+    success: boolean;
+}
+
+interface MetricsApiResponse {
+    statusCode: number;
+    data: AssignmentMetrics;
     message: string;
     success: boolean;
 }
@@ -39,14 +59,17 @@ interface ApiResponse {
 const AssignmentHistory = () => {
     const navigate = useNavigate();
     const [assignments, setAssignments] = useState<Assignment[]>([]);
+    const [metrics, setMetrics] = useState<AssignmentMetrics | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [metricsLoading, setMetricsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [metricsError, setMetricsError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchAssignments = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get<ApiResponse>('http://localhost:5000/api/assignments/history');
+                const response = await axios.get<AssignmentApiResponse>('http://localhost:5000/api/assignments/history');
                 setAssignments(response.data.data);
                 setLoading(false);
             } catch (err) {
@@ -56,9 +79,22 @@ const AssignmentHistory = () => {
             }
         };
 
-        fetchAssignments();
-    }, []);
+        const fetchMetrics = async () => {
+            try {
+                setMetricsLoading(true);
+                const response = await axios.get<MetricsApiResponse>('/api/assignments/metrics');
+                setMetrics(response.data.data);
+                setMetricsLoading(false);
+            } catch (err) {
+                setMetricsError('Failed to fetch assignment metrics');
+                setMetricsLoading(false);
+                console.error('Error fetching metrics:', err);
+            }
+        };
 
+        fetchAssignments();
+        fetchMetrics();
+    }, []);
 
     const formatDateTime = (dateTimeString: string) => {
         const date = new Date(dateTimeString);
@@ -70,8 +106,93 @@ const AssignmentHistory = () => {
 
     return (
         <div className="max-w-6xl mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Assignment History</h1>
+            <h1 className="text-2xl font-bold mb-6">Assignment Dashboard</h1>
+            
+            {/* Metrics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                {metricsLoading ? (
+                    <div className="col-span-4 bg-white p-4 rounded-lg shadow-md">
+                        <p className="text-gray-500">Loading metrics...</p>
+                    </div>
+                ) : metricsError ? (
+                    <div className="col-span-4 bg-red-50 p-4 rounded-lg shadow-md">
+                        <p className="text-red-500">{metricsError}</p>
+                    </div>
+                ) : metrics ? (
+                    <>
+                        <div className="bg-blue-50 p-6 rounded-lg shadow-md flex items-center">
+                            <div className="p-3 bg-blue-100 rounded-full mr-4">
+                                <PieChart className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Total Attempts</p>
+                                <p className="text-2xl font-bold text-blue-700">{metrics.totalAttempts}</p>
+                            </div>
+                        </div>
 
+                        <div className="bg-green-50 p-6 rounded-lg shadow-md flex items-center">
+                            <div className="p-3 bg-green-100 rounded-full mr-4">
+                                <CheckCircle className="h-6 w-6 text-green-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Successful Assignments</p>
+                                <p className="text-2xl font-bold text-green-700">{metrics.totalAssigned}</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-indigo-50 p-6 rounded-lg shadow-md flex items-center">
+                            <div className="p-3 bg-indigo-100 rounded-full mr-4">
+                                <AlertTriangle className="h-6 w-6 text-indigo-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Failed Assignments</p>
+                                <p className="text-2xl font-bold text-indigo-700">{metrics.totalAttempts - metrics.totalAssigned}</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-purple-50 p-6 rounded-lg shadow-md flex items-center">
+                            <div className="p-3 bg-purple-100 rounded-full mr-4">
+                                <FileWarning className="h-6 w-6 text-purple-600" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Success Rate</p>
+                                <p className="text-2xl font-bold text-purple-700">{metrics.successRate}%</p>
+                            </div>
+                        </div>
+                    </>
+                ) : null}
+            </div>
+
+            {/* Failure Reasons */}
+            {metrics && metrics.failureReasons.length > 0 && (
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 className="text-lg font-semibold mb-4">Failure Reasons</h2>
+                    <div className="overflow-hidden bg-gray-50 rounded-lg">
+                        <table className="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {metrics.failureReasons.map((item, index) => (
+                                    <tr key={index} className="hover:bg-gray-100">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.reason}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.count}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {((item.count / (metrics.totalAttempts - metrics.totalAssigned)) * 100).toFixed(1)}%
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            <h2 className="text-xl font-semibold mb-4">Assignment History</h2>
             <div className="bg-white shadow rounded-lg overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">

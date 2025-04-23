@@ -100,18 +100,24 @@ const getOrderById = async (req: Request, res: Response) => {
 
 const getAllOrders = async (req: Request, res: Response) => {
     try {
-        const { status, area, date } = req.query;
+        const { status, area, recent } = req.query;
 
         const filter: any = {};
 
         if (status) filter.status = status;
         if (area) filter.area = area;
 
-        if (date) {
-            const start = new Date(`${date}T00:00:00Z`);
-            const end = new Date(`${date}T23:59:59Z`);
+        if (recent === "true") {
+            const start = dayjs().subtract(1, "day").startOf("day").toDate();
+            const end = dayjs().endOf("day").toDate(); 
             filter.createdAt = { $gte: start, $lte: end };
-        }
+          }
+
+        // if (date) {
+        //     const start = new Date(`${date}T00:00:00Z`);
+        //     const end = new Date(`${date}T23:59:59Z`);
+        //     filter.createdAt = { $gte: start, $lte: end };
+        // }
 
         const orders = await Order.find(filter).sort({ createdAt: -1 }).populate("assignedTo", " _id name email");
 

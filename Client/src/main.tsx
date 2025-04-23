@@ -19,16 +19,18 @@ import History from "@/pages/Assignment/History"
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="/" element={<App />} />
-      <Route path="/partners/details/:id" element={<PartnerDetails />} />
-      <Route path="/partners" element={<PartnerList />} />
-      <Route path="/partners/new" element={<PartnerForm />} />
-      <Route path="/orders" element={<OrderList />} />
-      <Route path="/orders/:id" element={<OrderDetails />} />
-      {/* <Route path="/assignments/metrics" element={<Metrics />} /> */}
-      <Route path="/assignments/history" element={<History />} />
-      {/* Fallback */}
-      <Route path="*" element={<Dashboard />} />
+      <Route path="/" element={<App />} >
+        <Route index element={<Dashboard />} />
+        <Route path="/partners/details/:id" element={<PartnerDetails />} />
+        <Route path="/partners" element={<PartnerList />} />
+        <Route path="/partners/new" element={<PartnerForm />} />
+        <Route path="/orders" element={<OrderList />} />
+        <Route path="/orders/:id" element={<OrderDetails />} />
+        <Route path="/assignments" element={<History />} />
+        {/* <Route path="/assignments/metrics" element={<Metrics />} /> */}
+        {/* Fallback */}
+        <Route path="*" element={<Dashboard />} />
+      </Route>
     </>
   )
 );
