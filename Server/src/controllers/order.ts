@@ -86,7 +86,7 @@ const getOrderById = async (req: Request, res: Response) => {
             res.status(400).json(new ApiResponse(400, null, "Invalid order ID"));
         }
 
-        const order = await Order.findById(id).populate("assignedTo");
+        const order = await Order.findById(id).populate("assignedTo", " _id name email");
 
         if (!order) {
             res.status(404).json(new ApiResponse(404, null, "Order not found"));
@@ -113,7 +113,7 @@ const getAllOrders = async (req: Request, res: Response) => {
             filter.createdAt = { $gte: start, $lte: end };
         }
 
-        const orders = await Order.find(filter).sort({ createdAt: -1 }).populate("assignedTo");
+        const orders = await Order.find(filter).sort({ createdAt: -1 }).populate("assignedTo", " _id name email");
 
         if (!orders || orders.length === 0) {
             res.status(404).json(new ApiResponse(404, [], "No orders found"));
