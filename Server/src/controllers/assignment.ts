@@ -92,4 +92,17 @@ const getAssignmentMetrics = async (req: Request, res: Response) => {
     }
 }
 
-export { smartAssignment, getAssignmentMetrics }
+const getAssignmentHistory = async (req: Request, res: Response) => {
+    try {
+        const assignments = await Assignment.find()
+            .sort({ createdAt: -1 })
+            .populate("orderId", "orderNumber area status scheduledFor")
+            .populate("partnerId", "name email phone status")
+
+        res.status(200).json(new ApiResponse(200, assignments, "Assignment history fetched"));
+    } catch (error) {
+        res.status(500).json(new ApiResponse(500, null, "Failed to fetch assignment history"));
+    }
+}
+
+export { smartAssignment, getAssignmentMetrics, getAssignmentHistory }

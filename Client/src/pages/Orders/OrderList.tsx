@@ -58,7 +58,7 @@ export default function OrdersPage() {
 		const fetchOrders = async () => {
 			try {
 				setLoading(true);
-				const response = await axios.get<ApiResponse>('http://localhost:5000/api/orders');
+				const response = await axios.get<ApiResponse>('/api/orders');
 				if (response.data.success) {
 					setOrders(response.data.data);
 					setFilteredOrders(response.data.data);
@@ -78,7 +78,7 @@ export default function OrdersPage() {
 	}, []);
 
 	const handleManualAssign = async (e: React.MouseEvent, orderId: string): Promise<void> => {
-		e.stopPropagation(); // Prevent navigating to details page
+		e.stopPropagation()
 		alert(`Opening assignment interface for order: ${orderId}`);
 	};
 

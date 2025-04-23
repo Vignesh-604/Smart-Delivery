@@ -53,7 +53,7 @@ export default function OrderDetailsPage() {
     const fetchOrderDetails = async (): Promise<void> => {
       try {
         setLoading(true);
-        const response = await axios.get<ApiResponse>(`http://localhost:5000/api/orders/${id}`);
+        const response = await axios.get<ApiResponse>(`/api/orders/${id}`);
         if (response.data.success) {
           setOrder(response.data.data);
         } else {

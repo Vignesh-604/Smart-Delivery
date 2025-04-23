@@ -6,9 +6,9 @@ import mongoose from "mongoose";
 
 const registerPartner = async (req: Request, res: Response) => {
     try {
-        const { name, email, phone, areas, start, end } = req.body
+        const { name, email, phone, areas, shift } = req.body
 
-        if (!name || !email || !phone || !areas || !start || !end) {
+        if (!name || !email || !phone || !areas || !shift) {
             res.status(400).json(new ApiResponse(400, null, "Some fields are missing"));
         }
 
@@ -19,8 +19,7 @@ const registerPartner = async (req: Request, res: Response) => {
         }
 
         const partner = await DeliveryPartner.create({
-            name, email, phone, areas,
-            shift: { start, end }
+            name, email, phone, areas, shift
         });
 
         res.status(201).json(new ApiResponse(201, partner, "Partner registered successfully"));
@@ -31,13 +30,34 @@ const registerPartner = async (req: Request, res: Response) => {
 
 const getAllPartners = async (_req: Request, res: Response) => {
     try {
-        const partners = await DeliveryPartner.find();
+        const partners = await DeliveryPartner.find().select(" _id name area status currentLoad shift areas")
         if (!partners || partners.length === 0) {
             res.status(404).json(new ApiResponse(404, null, "NO partners found"));
             return;
         }
 
         res.status(200).json(new ApiResponse(200, partners, "All partners fetched"));
+    } catch (error) {
+        res.status(500).json(new ApiResponse(500, error, "Something went wrong while fetching partners"));
+
+    }
+}
+
+const getPartnerById = async (req: Request, res: Response) => {
+    try {
+        const { partnerId } = req.params;
+        if (!partnerId || !mongoose.isValidObjectId(partnerId)) {
+            res.status(400).json(new ApiResponse(400, null, "Invalid or missing partnerId"));
+            return;
+        }
+
+        const partner = await DeliveryPartner.findById(partnerId);
+        if (!partner) {
+            res.status(404).json(new ApiResponse(404, null, "NO partners found"));
+            return;
+        }
+
+        res.status(200).json(new ApiResponse(200, partner, "All partners fetched"));
     } catch (error) {
         res.status(500).json(new ApiResponse(500, error, "Something went wrong while fetching partners"));
 
@@ -131,6 +151,7 @@ const findEligiblePartners = async (req: Request, res: Response): Promise<void> 
 export {
     registerPartner,
     getAllPartners,
+    getPartnerById,
     updatePartner,
     deletePartner,
     findEligiblePartners,
