@@ -167,8 +167,8 @@ const AssignmentHistory = () => {
             {metrics && metrics.failureReasons.length > 0 && (
                 <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                     <h2 className="text-lg font-semibold mb-4">Failure Reasons</h2>
-                    <div className="overflow-hidden bg-gray-50 rounded-lg">
-                        <table className="min-w-full">
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
                             <thead>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
@@ -194,71 +194,135 @@ const AssignmentHistory = () => {
 
             <h2 className="text-xl font-semibold mb-4">Assignment History</h2>
             <div className="bg-white shadow rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Area</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled For</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partner</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {assignments.map((assignment) => (
-                            <tr key={assignment._id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <button
-                                        onClick={() => navigate(`/orders/${assignment.orderId._id}`)}
-                                        className="text-black hover:text-blue-800 hover:underline bg-blue-100 px-2 rounded-2xl cursor-pointer font-semibold"
-                                    >
-                                        {assignment.orderId.orderNumber}
-                                    </button>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {assignment.orderId.area}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {assignment.orderId.scheduledFor}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                {/* Responsive Table Container */}
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Area</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled For</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Partner</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {assignments.map((assignment) => (
+                                <tr key={assignment._id} className="hover:bg-gray-50">
+                                    <td className="px-4 py-3 whitespace-nowrap">
+                                        <button
+                                            onClick={() => navigate(`/orders/${assignment.orderId._id}`)}
+                                            className="text-black hover:text-blue-800 hover:underline bg-blue-100 px-2 rounded-2xl cursor-pointer font-semibold"
+                                        >
+                                            {assignment.orderId.orderNumber}
+                                        </button>
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap">
+                                        {assignment.orderId.area}
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap">
+                                        {assignment.orderId.scheduledFor}
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap">
+                                        <button
+                                            onClick={() => navigate(`/partners/details/${assignment.partnerId._id}`)}
+                                            className="text-black hover:text-blue-800 hover:underline bg-blue-100 px-2 rounded-2xl cursor-pointer font-semibold"
+                                        >
+                                            {assignment.partnerId.name}
+                                        </button>
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap">
+                                        <span
+                                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            ${assignment.status === 'success'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'}`}
+                                        >
+                                            {assignment.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                        {assignment.reason || '-'}
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                        {formatDateTime(assignment.createdAt)}
+                                    </td>
+                                </tr>
+                            ))}
+
+                            {assignments.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="px-4 py-3 text-center text-gray-500">
+                                        No assignment history found
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            {/* Alternative Mobile View for Small Screens */}
+            <div className="md:hidden mt-4">
+                <h3 className="text-lg font-medium mb-2">Mobile View</h3>
+                <div className="space-y-4">
+                    {assignments.map((assignment) => (
+                        <div key={assignment._id} className="bg-white rounded-lg shadow p-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <button
+                                    onClick={() => navigate(`/orders/${assignment.orderId._id}`)}
+                                    className="text-black hover:text-blue-800 hover:underline bg-blue-100 px-2 py-1 rounded-2xl cursor-pointer font-semibold"
+                                >
+                                    {assignment.orderId.orderNumber}
+                                </button>
+                                <span
+                                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    ${assignment.status === 'success'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-red-100 text-red-800'}`}
+                                >
+                                    {assignment.status}
+                                </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div className="text-gray-500">Area:</div>
+                                <div>{assignment.orderId.area}</div>
+                                
+                                <div className="text-gray-500">Scheduled For:</div>
+                                <div>{assignment.orderId.scheduledFor}</div>
+                                
+                                <div className="text-gray-500">Partner:</div>
+                                <div>
                                     <button
                                         onClick={() => navigate(`/partners/details/${assignment.partnerId._id}`)}
                                         className="text-black hover:text-blue-800 hover:underline bg-blue-100 px-2 rounded-2xl cursor-pointer font-semibold"
                                     >
                                         {assignment.partnerId.name}
                                     </button>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                        ${assignment.status === 'success'
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'}`}
-                                    >
-                                        {assignment.status}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {assignment.reason || '-'}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {formatDateTime(assignment.createdAt)}
-                                </td>
-                            </tr>
-                        ))}
-
-                        {assignments.length === 0 && (
-                            <tr>
-                                <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                                    No assignment history found
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                </div>
+                                
+                                {assignment.reason && (
+                                    <>
+                                        <div className="text-gray-500">Reason:</div>
+                                        <div>{assignment.reason}</div>
+                                    </>
+                                )}
+                                
+                                <div className="text-gray-500">Created At:</div>
+                                <div>{formatDateTime(assignment.createdAt)}</div>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    {assignments.length === 0 && (
+                        <div className="bg-white rounded-lg shadow p-4 text-center text-gray-500">
+                            No assignment history found
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

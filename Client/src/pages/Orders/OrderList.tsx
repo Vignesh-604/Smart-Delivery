@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Users, Package } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface Item {
 	name: string;
@@ -51,6 +51,7 @@ export default function OrdersPage() {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const [activeFilter, setActiveFilter] = useState<FilterStatus>('all');
+	const [showFilterDropdown, setShowFilterDropdown] = useState<boolean>(false);
 
 	const navigate = useNavigate();
 
@@ -88,6 +89,7 @@ export default function OrdersPage() {
 
 	const filterOrders = (status: FilterStatus): void => {
 		setActiveFilter(status);
+		setShowFilterDropdown(false);
 
 		if (status === 'all') {
 			setFilteredOrders(orders);
@@ -134,36 +136,14 @@ export default function OrdersPage() {
 
 	return (
 		<div className="bg-gray-50 min-h-screen">
-
-			<div className="bg-gray-100 p-4 mb-4 md:hidden">
-				<h1 className="text-xl font-bold text-gray-800">Welcome back, Admin!</h1>
-				<p className="text-gray-500 text-sm">Here's what's happening today</p>
-				
-				<div className="flex mt-4 space-x-2">
-					<button className="flex items-center border border-gray-300 rounded-lg px-4 py-2 text-gray-700">
-						<Users className="h-4 w-4 mr-2" />
-						Partners
-					</button>
-					<button className="flex items-center bg-blue-600 text-white rounded-lg px-4 py-2">
-						<Package className="h-4 w-4 mr-2" />
-						Orders
-					</button>
-					<button className="flex items-center border border-gray-300 rounded-lg px-4 py-2 text-gray-700">
-						<Users className="h-4 w-4 mr-2" />
-						Assignments
-					</button>
-				</div>
-			</div>
-
-			<div className="px-4 md:px-6 max-w-6xl mx-auto">
-
-				<div className="hidden md:flex justify-between items-center mb-6">
-					<h1 className="text-2xl font-bold text-gray-800">Orders</h1>
+			<div className="px-4 md:px-6 py-4 max-w-6xl mx-auto">
+				<div className="flex justify-between items-center mb-6">
+					<h1 className="text-xl md:text-2xl font-bold text-gray-800">Orders</h1>
 				</div>
 
 				<div className="flex items-center mb-4">
-					<h2 className="text-xl font-bold text-gray-800 mr-2 md:hidden">Orders</h2>
-					<div className="flex overflow-x-auto scrollbar-hide space-x-1 bg-white rounded-lg p-1 shadow-sm">
+					{/* Desktop Filters */}
+					<div className="hidden md:flex overflow-x-auto space-x-1 bg-white rounded-lg p-1 shadow-sm">
 						{(['all', 'pending', 'assigned', 'delivered', 'picked', 'cancelled'] as FilterStatus[]).map((status) => (
 							<button
 								key={status}
@@ -176,6 +156,37 @@ export default function OrdersPage() {
 								{status.charAt(0).toUpperCase() + status.slice(1)}
 							</button>
 						))}
+					</div>
+					
+					{/* Mobile Filter Dropdown */}
+					<div className="md:hidden relative">
+						<button 
+							onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+							className="flex items-center justify-between w-40 bg-white border border-gray-200 rounded-lg px-4 py-2 shadow-sm"
+						>
+							<span className="text-sm font-medium">
+								{activeFilter.charAt(0).toUpperCase() + activeFilter.slice(1)}
+							</span>
+							<ChevronDown className={`h-4 w-4 ml-2 transition-transform ${showFilterDropdown ? 'transform rotate-180' : ''}`} />
+						</button>
+						
+						{showFilterDropdown && (
+							<div className="absolute z-10 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+								{(['all', 'pending', 'assigned', 'delivered', 'picked', 'cancelled'] as FilterStatus[]).map((status) => (
+									<button
+										key={status}
+										onClick={() => filterOrders(status)}
+										className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+											activeFilter === status 
+												? 'bg-blue-50 text-blue-700 font-medium' 
+												: 'hover:bg-gray-50 text-gray-700'
+										}`}
+									>
+										{status.charAt(0).toUpperCase() + status.slice(1)}
+									</button>
+								))}
+							</div>
+						)}
 					</div>
 				</div>
 
