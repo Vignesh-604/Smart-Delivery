@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 interface Customer {
     name: string;
@@ -88,6 +89,17 @@ const Dashboard = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
+
+                Swal.fire({
+                    title: "Please Note",
+                    text: "The server may need about 50 seconds to initialize on first connection as it's hosted on Render's free tier.",
+                    icon: "info",
+                    confirmButtonText: "Understood",
+                    confirmButtonColor: "#3085d6",
+                    timer: 8000,
+                    timerProgressBar: true
+                })
+
                 const [ordersResponse, assignmentsResponse, metricsResponse] = await Promise.all([
                     axios.get("/api/orders?recent=true"),
                     axios.get("/api/assignments/history?recent=true"),

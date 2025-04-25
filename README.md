@@ -5,6 +5,9 @@ Built with TypeScript, React, Express, Node, and MongoDB in just four days. Desp
 
 ---
 
+> [!NOTE]
+> The server may need about 50 seconds to initialize on first connection as it's hosted on Render's free tier.
+
 ## Tech Stack
 
 ### Backend 
